@@ -8,8 +8,8 @@
 set -e
 
 #TARGET=ia32-generic
-#TARGET=armv7a7-imx6ull
-TARGET=riscv64-spike
+TARGET=armv7a7-imx6ull
+#TARGET=riscv64-spike
 
 TARGET_FAMILY=`echo $TARGET | awk -F- '{ print $1 }'`
 TARGET_SUBFAMILY=$TARGET_FAMILY-`echo $TARGET | awk -F- '{ print $2 }'`

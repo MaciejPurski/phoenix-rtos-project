@@ -47,7 +47,7 @@ b_build_target() {
 
 	b_log "Creating CPIO archive"
 	pushd $PREFIX_PROG_STRIPPED >/dev/null
-		ls psh dummyfs imx6ull-flash imx6ull-uart psd | cpio -H newc -ov >$PREFIX_BUILD/phoenix-rtos-kernel/programs.cpio 2>/dev/null
+		ls psh dummyfs imx6ull-uart imx6ull-flash | cpio -H newc -ov >$PREFIX_BUILD/phoenix-rtos-kernel/programs.cpio 2>/dev/null
 	popd >/dev/null
 
 	# Relink kernel to include newly created cpio archive
@@ -60,17 +60,20 @@ b_image_target() {
 	size=`du -k -s $PREFIX_ROOTFS | awk '{ print $1 }'`
 	size=`expr ${size} \* 2`
 
-	IMG_VERSION="$(git describe --dirty 2> /dev/null || echo unknown-$(git describe --always --dirty))"
-	echo "$IMG_VERSION" > $PREFIX_ROOTFS/etc/version
+	cp -a _build/$TARGET/prog.stripped/phoenix-$TARGET.elf $PREFIX_BOOT
 
-	mtd-utils/build.sh
+	${CROSS}objcopy -O binary ${PREFIX_PROG_STRIPPED}phoenix-${TARGET}.elf $PREFIX_BOOT/phoenix-${TARGET}.img
+	#IMG_VERSION="$(git describe --dirty 2> /dev/null || echo unknown-$(git describe --always --dirty))"
+	#echo "$IMG_VERSION" > $PREFIX_ROOTFS/etc/version
 
-	_build/host/prog/mkfs.jffs2 -n -U -m none -e $((64*4096)) -s 4096 -r "$PREFIX_ROOTFS"/ -o _boot/phoenix-armv7a7-imx6ull.jffs2
+	#mtd-utils/build.sh
 
-	sz=`du -k _boot/phoenix-armv7a7-imx6ull.jffs2 | awk '{ print $1 }'`
-	echo "Filesystem size: ${sz}KB"
+	#_build/host/prog/mkfs.jffs2 -n -U -m none -e $((64*4096)) -s 4096 -r "$PREFIX_ROOTFS"/ -o _boot/phoenix-armv7a7-imx6ull.jffs2
 
-#	cp -a _build/phoenix-armv7a7-imx6ull.elf $PREFIX_BOOT
+	#sz=`du -k _boot/phoenix-armv7a7-imx6ull.jffs2 | awk '{ print $1 }'`
+	#echo "Filesystem size: ${sz}KB"
+
+
 }
 
 
